@@ -5,7 +5,8 @@ import com.cobblemon.mod.common.api.storage.party.PartyStore;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,25 +20,17 @@ public class CobblegorBattleLinker implements ModInitializer {
         LOGGER.info("Initializing Cobblegor Battle Linker");
         LOGGER.info("AUTHORS: Ponchisao326");
 
-
-
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            dispatcher.register(CommandManager.literal("test")
+                    .executes(context -> {
+                        ServerPlayerEntity player = context.getSource().getPlayer();
+                        PartyStore partyStore = logPlayerParty(player);
+                        return 1;
+                    }));
+        });
     }
 
-    public void logPlayerParty(ServerPlayer player) {
-        PartyStore party = Cobblemon.INSTANCE.getStorage().getParty(player);
-
-        for (Pokemon pokemon : party) {
-            if (pokemon != null) {
-                String speciesName = pokemon.getSpecies().getName();
-                int level = pokemon.getLevel();
-                boolean isShiny = pokemon.getShiny();
-
-                System.out.println("Pokemon encontrado: " + speciesName + " (Nivel " + level + ")");
-
-                if (isShiny) {
-                    System.out.println("¡Es Shiny!");
-                }
-            }
-        }
+    public PartyStore logPlayerParty(ServerPlayerEntity player) {
+        return Cobblemon.INSTANCE.getStorage().getParty(player);
     }
 }
