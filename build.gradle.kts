@@ -24,23 +24,33 @@ loom {
 repositories {
     mavenCentral()
     maven(url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
-    maven("https://maven.impactdev.net/repository/development/")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven(url = "https://maven.impactdev.net/repository/development/")
+    maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
     minecraft("net.minecraft:minecraft:1.21.1")
-    mappings(loom.officialMojangMappings())
+    mappings("net.fabricmc:yarn:1.21.1+build.3:v2")
     modImplementation("net.fabricmc:fabric-loader:0.17.2")
 
     modRuntimeOnly("net.fabricmc.fabric-api:fabric-api:0.116.6+1.21.1")
-    modImplementation(fabricApi.module("fabric-command-api-v2", "0.116.6+1.21.1"))
+    modImplementation(fabricApi. module("fabric-command-api-v2", "0.116.6+1.21.1"))
 
     modImplementation("net.fabricmc:fabric-language-kotlin:1.13.6+kotlin.2.2.20")
     modImplementation("com.cobblemon:fabric:1.7.1+1.21.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+
+    implementation("redis.clients:jedis:5.1.0")
+    include("redis.clients:jedis:5.1.0")
+
+    implementation("org.apache.commons:commons-pool2:2.12.0")
+    include("org.apache.commons:commons-pool2:2.12.0")
+
+    // Necesario para que Jedis funcione bien dentro de Minecraft a veces:
+    implementation("org.json:json:20231013")
+    include("org.json:json:20231013")
 }
 
 tasks.getByName<Test>("test") {
