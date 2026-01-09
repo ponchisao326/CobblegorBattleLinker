@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "cobblegorbattlelinker",
+  "version": "${version}",
+  "name": "Cobblegor Battle Linker",
+  "description": "",
+  "authors": [
+    "Ponchisao326"
+  ],
+  "license": "ARR License",
+  "icon": "assets/example/icon.png",
+  "environment": "SERVER",
+  "entrypoints": {
+    "main": [
+      "com.victorgponce.CobblegorBattleLinker"
+    ]
+  },
+  "depends": {
+    "minecraft": "1.21.1",
+    "cobblemon": ">=1.7.0"
+  }
+}
