@@ -8,6 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Singleton configuration manager for the mod.
+ * <p>
+ * Handles the loading and saving of configuration settings (Redis credentials, server name, TTL)
+ * to a JSON file located in the server's config directory.
+ */
 public class ModConfig {
 
     private static ModConfig INSTANCE;
@@ -27,6 +33,12 @@ public class ModConfig {
         load();
     }
 
+    /**
+     * Retrieves the singleton instance of the configuration.
+     * Creates the instance if it does not already exist.
+     *
+     * @return the singleton {@link ModConfig} instance.
+     */
     public static ModConfig get() {
         if (INSTANCE == null) {
             INSTANCE = new ModConfig();
@@ -34,6 +46,13 @@ public class ModConfig {
         return INSTANCE;
     }
 
+    /**
+     * Loads the configuration from the JSON file on disk.
+     * <br><br>
+     * Ensures the configuration directory exists. If the configuration file is missing,
+     * a new file is created with the current default values by calling {@link #save()}.
+     * If the file exists, parses the JSON and updates the corresponding fields.
+     */
     public void load() {
         try {
             // If the directory doesn't exist, create it
@@ -62,6 +81,12 @@ public class ModConfig {
         }
     }
 
+    /**
+     * Saves the current configuration to disk as JSON.
+     * <br><br>
+     * Serializes fields and writes them to `config/CobblegorBattleLinker/config.json`
+     * using an indentation of 4 spaces. The existing file is overwritten.
+     */
     public void save() {
         try {
             JSONObject json = new JSONObject();

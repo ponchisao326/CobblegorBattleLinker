@@ -15,6 +15,12 @@ import java.util.UUID;
 
 import static com.victorgponce.CobblegorBattleLinker.LOGGER;
 
+/**
+ * Singleton manager responsible for handling Redis connections via a {@link JedisPool}.
+ * <p>
+ * This class abstracts the low-level Redis operations, managing connection pooling,
+ * serialization, and asynchronous I/O for party data storage.
+ */
 public class RedisManager {
 
     private static RedisManager INSTANCE;
@@ -48,8 +54,7 @@ public class RedisManager {
      * Returns the singleton instance of RedisManager.
      * <br><br>
      * The instance is created lazily on first access.
-     * Note: initialization is not synchronized; concurrent initialization
-     * from multiple threads may produce a race condition.
+     * Note: Initialization performs a connection test; if it fails, a RuntimeException is thrown.
      *
      * @return the single RedisManager instance
      */
@@ -61,13 +66,11 @@ public class RedisManager {
     /**
      * Saves a player's party NBT to Redis asynchronously.
      * <br><br>
-     * The NbtCompound is written in compressed form and stored as a byte array under a key
-     * prefixed with "battlelink:". The stored value is set to expire after 120 seconds.
-     * This method returns immediately; the actual Redis I/O is executed on a new background
-     * thread to avoid blocking the main server thread.
-     * <br><br>
+     * The NbtCompound is compressed, serialized to bytes, and stored under a key prefixed
+     * with "battlelink:". The key is assigned a TTL (Time To Live) defined in the configuration.
+     *
      * @param playerUuid the UUID of the player whose party will be saved
-     * @param nbt the NbtCompound representing the player's party to serialize and store
+     * @param nbt the NbtCompound representing the player's party
      */
     public void saveParty(UUID playerUuid, NbtCompound nbt) {
         // Execute in a new thread to avoid freezing the Main Server Thread
@@ -95,12 +98,11 @@ public class RedisManager {
     /**
      * Loads a player's party NBT from Redis.
      * <br><br>
-     * The method reads a compressed NBT byte array stored under the key prefixed with "battlelink:" and the player's UUID,
-     * deletes the key after reading (cleanup), and deserializes the bytes into an NbtCompound using NbtIo.readCompressed
-     * with an unlimited NbtSizeTracker. If the key is not present or an error occurs, the method returns null.
-     * <br><br>
+     * Fetches the compressed byte array associated with the player's UUID. If found, the data
+     * is deleted from Redis (one-time fetch) and deserialized into an NbtCompound.
+     *
      * @param playerUuid the UUID of the player whose party will be loaded
-     * @return the deserialized NbtCompound if found, or null if the key does not exist or on error
+     * @return the deserialized NbtCompound if found, or null if missing or on error
      */
     public NbtCompound loadParty(UUID playerUuid) {
         try (Jedis jedis = pool.getResource()) {

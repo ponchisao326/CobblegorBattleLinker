@@ -7,8 +7,19 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+/**
+ * Command logic for {@code /battle save}.
+ * <p>
+ * This command initiates the process of saving the player's Cobblemon party to Redis.
+ */
 public class SaveCommand implements Command<ServerCommandSource> {
 
+    /**
+     * Executes the save command for the invoking player by delegating to PartyService.
+     *
+     * @param context the command context providing the command source and arguments
+     * @return 1 if the party was saved successfully, 0 if an error occurred or the player is unavailable
+     */
     @Override
     public int run(CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();

@@ -6,8 +6,20 @@ import com.victorgponce.service.PartyService;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+/**
+ * Command logic for {@code /battle load}.
+ * <p>
+ * This command initiates the process of retrieving and loading the player's Cobblemon party from Redis.
+ */
 public class LoadCommand implements Command<ServerCommandSource> {
 
+    /**
+     * Executes the load command for the calling player.
+     * Delegates the load logic to PartyService and ensures any server-thread work is scheduled on the main thread.
+     *
+     * @param context the command execution context providing the command source
+     * @return 1 on success, 0 if the command could not be executed (e.g. no player)
+     */
     @Override
     public int run(CommandContext<ServerCommandSource> context) {
         ServerPlayerEntity player = context.getSource().getPlayer();

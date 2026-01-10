@@ -7,18 +7,29 @@ import com.victorgponce.CobblegorBattleLinker;
 import com.victorgponce.manager.RedisManager;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.UUID;
 
+/**
+ * Service class responsible for managing the persistence and synchronization of Cobblemon parties
+ * across servers using Redis.
+ * <p>
+ * This service handles the serialization of party data to NBT for storage and the retrieval
+ * and application of that data to player entities, ensuring thread safety and proper GUI updates.
+ */
 public class PartyService {
 
     /**
-     * Serializes the player's party, sends it to Redis, clears the current party,
-     * and updates the client.
+     * Serializes the player's party to NBT and stores it in Redis for cross-server transfers.
+     * <br><br>
+     * Uses `registries` to resolve references required during NBT serialization,
+     * sends the data to {@link RedisManager#saveParty}, and notifies the player.
+     *
+     * @param player the player whose party will be serialized
+     * @param registries the `DynamicRegistryManager` used for NBT serialization
      */
     public static void saveParty(ServerPlayerEntity player, DynamicRegistryManager registries) {
         PartyStore party = Cobblemon.INSTANCE.getStorage().getParty(player);
@@ -40,8 +51,15 @@ public class PartyService {
     }
 
     /**
-     * Fetches data from Redis asynchronously, then schedules a task on the main server thread
+     * Asynchronously retrieves the player's party data from Redis and schedules a task on the main server thread
      * to populate the player's party safely.
+     * <br><br>
+     * This method spawns a new thread to avoid blocking the main server tick loop during the Redis fetch operation.
+     * If data is found, the application of that data (via {@link #applyPartyToPlayer}) is delegated back to the
+     * main server thread to ensure thread safety.
+     *
+     * @param player the player whose party is being loaded
+     * @param server the MinecraftServer instance used to schedule the main thread task
      */
     public static void loadParty(ServerPlayerEntity player, MinecraftServer server) {
         UUID uuid = player.getUuid();
@@ -62,8 +80,20 @@ public class PartyService {
     }
 
     /**
-     * Private helper to apply the NBT data to the player.
-     * Uses the "One-by-One" adding strategy to ensure GUI updates.
+     * Private helper method that deserializes NBT data and applies it to the player's party.
+     * <br><br>
+     * This method employs a "One-by-One" addition strategy:
+     * <ul>
+     * <li>Loads data into a temporary in-memory party.</li>
+     * <li>Clears the player's actual party.</li>
+     * <li>Iterates through the temporary party and adds each Pokemon individually to the actual party.</li>
+     * </ul>
+     * This strategy ensures that internal "Pokemon Added" events are triggered correctly, allowing the client-side
+     * GUI to update properly. It also resets storage coordinates to prevent issues with cross-world movement.
+     *
+     * @param player the player receiving the party
+     * @param data the NbtCompound containing the serialized party data
+     * @param server the server instance used for registry access during deserialization
      */
     private static void applyPartyToPlayer(ServerPlayerEntity player, NbtCompound data, MinecraftServer server) {
         PartyStore party = Cobblemon.INSTANCE.getStorage().getParty(player);
