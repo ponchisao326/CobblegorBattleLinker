@@ -1,5 +1,6 @@
 package com.victorgponce.manager;
 
+import com.victorgponce.config.ModConfig;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtSizeTracker;
@@ -12,19 +13,35 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
+import static com.victorgponce.CobblegorBattleLinker.LOGGER;
+
 public class RedisManager {
 
     private static RedisManager INSTANCE;
     private final JedisPool pool;
 
     private RedisManager() {
-        // Pool para manejar múltiples conexiones
-        // En un futuro se hara mediante archivo de config
-        JedisPoolConfig config = new JedisPoolConfig();
-        config.setMaxTotal(16);
-        config.setMaxIdle(8);
+        ModConfig config = ModConfig.get();
 
-        this.pool = new JedisPool(config, "localhost", 6379);
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(16);
+        poolConfig.setMaxIdle(8);
+
+        this.pool = new JedisPool(poolConfig, config.getRedisHost(), config.getRedisPort(), 2000, config.getRedisPassword());
+
+        // Test Redis connection before initiation the server
+        try (Jedis jedis = pool.getResource()) {
+            String response = jedis.ping();
+            if (!response.equals("PONG")) {
+                throw new RuntimeException("[CobblegorBattleLinker] Redis no ha podido conectarse: " + response);
+            }
+            LOGGER.info("[CobblegorBattleLinker] Conexion a Redis exitosa en {}:{}", config.getRedisHost(), config.getRedisPort());
+        } catch (Exception e) {
+            LOGGER.info("[CobblegorBattleLinker] Critical: Error al conectar a Redis. Deteniendo Servidor");
+            throw new RuntimeException("[CobblegorBattleLinker] Fallo crítico de conexión a Redis", e);
+        }
+
+        LOGGER.info("[CobblegorBattleLinker] Server ID actual: {}", config.getServer());
     }
 
     /**
@@ -63,8 +80,10 @@ public class RedisManager {
                 // Use a prefix to avoid collisions with other plugins
                 String key = "battlelink:" + playerUuid.toString();
 
+                int ttl = ModConfig.get().getRedisTtl();
+
                 jedis.set(key.getBytes(), data);
-                jedis.expire(key.getBytes(), 120); // TTL: 120 seconds
+                jedis.expire(key.getBytes(), ttl);
 
                 System.out.println("[Redis] Party guardada para " + playerUuid);
             } catch (IOException e) {
