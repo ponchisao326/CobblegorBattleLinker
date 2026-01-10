@@ -85,7 +85,7 @@ public class RedisManager {
                 jedis.set(key.getBytes(), data);
                 jedis.expire(key.getBytes(), ttl);
 
-                System.out.println("[Redis] Party guardada para " + playerUuid);
+                LOGGER.info("[Redis] Party guardada para {}", playerUuid);
             } catch (IOException e) {
                 e.printStackTrace();
             }
