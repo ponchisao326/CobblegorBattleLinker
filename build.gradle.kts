@@ -33,7 +33,7 @@ dependencies {
     mappings("net.fabricmc:yarn:1.21.1+build.3:v2")
     modImplementation("net.fabricmc:fabric-loader:0.17.2")
 
-    modRuntimeOnly("net.fabricmc.fabric-api:fabric-api:0.116.6+1.21.1")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.116.6+1.21.1")
     modImplementation(fabricApi. module("fabric-command-api-v2", "0.116.6+1.21.1"))
 
     modImplementation("net.fabricmc:fabric-language-kotlin:1.13.6+kotlin.2.2.20")
