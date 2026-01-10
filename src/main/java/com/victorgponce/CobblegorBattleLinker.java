@@ -43,8 +43,6 @@ public class CobblegorBattleLinker implements ModInitializer {
         }
 
         // Register commands
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            ModCommands.register(dispatcher);
-        });
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> ModCommands.register(dispatcher));
     }
 }
