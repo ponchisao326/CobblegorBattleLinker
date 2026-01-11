@@ -18,8 +18,8 @@ public class ModCommands {
      */
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("battle")
-                .then(CommandManager.literal("save").executes(new SaveCommand()))
-                .then(CommandManager.literal("load").executes(new LoadCommand()))
+                .then(CommandManager.literal("save").requires(source -> source.hasPermissionLevel(2)).executes(new SaveCommand()))
+                .then(CommandManager.literal("load").requires(source -> source.hasPermissionLevel(2)).executes(new LoadCommand()))
         );
     }
 }
