@@ -1,6 +1,5 @@
 package com.victorgponce.mixin;
 
-import com.victorgponce.CobblegorBattleLinker;
 import com.victorgponce.service.PartyService;
 import net.minecraft.network.packet.c2s.play.ChatCommandSignedC2SPacket;
 import net.minecraft.network.packet.c2s.play.CommandExecutionC2SPacket;
@@ -44,7 +43,7 @@ public class CommandListenerMixin {
      */
     @Unique
     private void processCommand(String command) {
-        if (command.toLowerCase().equals("ranked")) {
+        if (command.equalsIgnoreCase("ranked")) {
             LOGGER.info("Detected /ranked command from {}. Auto-saving party...", player.getName().getString());
 
             try {
