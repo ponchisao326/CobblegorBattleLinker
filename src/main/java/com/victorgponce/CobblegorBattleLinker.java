@@ -1,9 +1,11 @@
 package com.victorgponce;
 
 import com.victorgponce.command.ModCommands;
+import com.victorgponce.event.PlayerJoinListener;
 import com.victorgponce.manager.RedisManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,5 +46,8 @@ public class CobblegorBattleLinker implements ModInitializer {
 
         // Register commands
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> ModCommands.register(dispatcher));
+
+        // Register event listeners
+        ServerPlayConnectionEvents.JOIN.register(new PlayerJoinListener());
     }
 }
