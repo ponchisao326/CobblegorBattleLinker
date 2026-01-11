@@ -8,8 +8,8 @@
     "Ponchisao326"
   ],
   "license": "ARR License",
-  "icon": "assets/example/icon.png",
-  "environment": "SERVER",
+  "icon": "assets/cobblegorbattlelinker/icon.png",
+  "environment": "server",
   "entrypoints": {
     "main": [
       "com.victorgponce.CobblegorBattleLinker"
